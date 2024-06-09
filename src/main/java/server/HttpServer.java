@@ -9,12 +9,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HttpServer {
     private final int port;
-    private Map<String, EndpointHandler> endpoints;
+    private final Map<String, EndpointHandler> endpoints;
 
     public HttpServer(int port) {
         this.port = port;
@@ -44,53 +46,67 @@ public class HttpServer {
             StringBuilder sb = new StringBuilder();
             String line;
             while (!(line = in.readLine()).isEmpty()) {
-                sb.append(line).append("\r\n");
+                sb.append(line)
+                  .append("\r\n");
             }
 
             HttpRequest clientReq = new HttpRequest(sb.toString());
             HttpResponse resp = new HttpResponse(HttpStatus.NOT_FOUND);
 
-            // Handle requests
-            if (endpoints.containsKey(clientReq.requestTarget())) {
-                //! Has a side effect of modifying the endpoints map
-                addParamsToRequest(clientReq);
+            var handler = findHandlerAndUpdateRequest(endpoints, clientReq);
 
+            // Handle requests
+            if (handler != null) {
                 resp.setHttpStatus(HttpStatus.OK);
-                endpoints.get(clientReq.requestTarget()).handle(resp, clientReq);
-                int contentLength = resp.getResponseBody().length();
+                handler.handle(resp, clientReq);
+
+                int contentLength = resp.getResponseBody()
+                                        .length();
+
                 if (contentLength > 0) {
-                    resp.setHeaders(HttpHeaders.builder().contentType("text/plain").contentLength(contentLength));
+                    resp.setHeaders(HttpHeaders.builder()
+                                               .contentType("text/plain")
+                                               .contentLength(contentLength));
                 }
             }
             System.out.println("resp.buildString() = " + resp.buildString());
 
-            out.write(resp.buildString().getBytes());
+            out.write(resp.buildString()
+                          .getBytes());
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
         }
     }
 
-    private void addParamsToRequest(HttpRequest clientReq) {
-        var transformedEndpoints = new HashMap<String, EndpointHandler>();
+    private EndpointHandler findHandlerAndUpdateRequest(Map<String, EndpointHandler> endpoints, HttpRequest req) {
+        String[] requestFragments = req.requestTarget()
+                                       .split("/");
 
         for (String url : endpoints.keySet()) {
-            String[] fragments = url.split("/");
+            String[] urlFragments = url.split("/");
+            String lastUF = urlFragments[urlFragments.length - 1];
 
-            String last = fragments[fragments.length - 1];
+            // requestParams
+            if (lastUF.startsWith("{") && lastUF.endsWith("}")) {
+                String sDropLast = Arrays.stream(urlFragments)
+                                         .limit(urlFragments.length - 1)
+                                         .collect(Collectors.joining("/"));
 
-            // find params if there are any
-            if(last.startsWith("{") && last.endsWith("}")) {
-                String param = last.replace("{", "");
-                param = param.replace("}", "");
+                String cDropLast = Arrays.stream(requestFragments)
+                                         .limit(urlFragments.length - 1)
+                                         .collect(Collectors.joining("/"));
 
-                String[] clientFragments = clientReq.requestTarget().split("/");
-                String lastCF = clientFragments[fragments.length - 1];
+                if (sDropLast.equals(cDropLast)) {
+                    String lastRF = requestFragments[requestFragments.length - 1];
 
-                clientReq.addParameter(param, lastCF);
-                fragments[fragments.length - 1] = lastCF;
+                    String param = lastUF.replace("{", "");
+                    param = param.replace("}", "");
+                    req.addParameter(param, lastRF);
+                    return endpoints.get(url);
+                }
             }
-            transformedEndpoints.put(String.join("/", fragments), endpoints.get(url));
         }
-        this.endpoints = transformedEndpoints;
+
+        return null;
     }
 }
