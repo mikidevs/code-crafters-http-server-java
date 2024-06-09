@@ -31,10 +31,14 @@ public class Main {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(clientSocket.getInputStream()));
 
-            String clientRequest = in.readLine();
-            System.out.println(clientRequest);
+            StringBuilder sb = new StringBuilder();
 
-            HttpRequest req = new HttpRequest(clientRequest);
+            String line;
+            while (!(line = in.readLine()).isEmpty()) {
+                sb.append(line).append("\r\n");
+            }
+
+            HttpRequest req = new HttpRequest(sb.toString());
 
             HttpResponse resp;
 
