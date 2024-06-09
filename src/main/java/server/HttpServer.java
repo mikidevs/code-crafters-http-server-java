@@ -50,11 +50,11 @@ public class HttpServer {
             HttpRequest clientReq = new HttpRequest(sb.toString());
             HttpResponse resp = new HttpResponse(HttpStatus.NOT_FOUND);
 
-            //! Has a side effect of modifying the endpoints map
-            addParamsToRequest(clientReq);
-
             // Handle requests
             if (endpoints.containsKey(clientReq.requestTarget())) {
+                //! Has a side effect of modifying the endpoints map
+                addParamsToRequest(clientReq);
+
                 resp.setHttpStatus(HttpStatus.OK);
                 endpoints.get(clientReq.requestTarget()).handle(resp, clientReq);
                 int contentLength = resp.getResponseBody().length();
