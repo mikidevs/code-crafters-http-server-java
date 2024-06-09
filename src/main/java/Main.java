@@ -1,6 +1,14 @@
+import com.sun.tools.jconsole.JConsoleContext;
+import http.HttpRequest;
+import http.HttpStatus;
+import http.HttpResponse;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
@@ -20,9 +28,23 @@ public class Main {
             clientSocket = serverSocket.accept(); // Wait for connection from client.
             System.out.println("accepted new connection");
 
-            HttpResponse response = new HttpResponse(HTTPStatus.OK);
-            System.out.println(response.getResponse());
-            clientSocket.getOutputStream().write(response.getResponse().getBytes());
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(clientSocket.getInputStream()));
+
+            String clientRequest = in.readLine();
+            System.out.println(clientRequest);
+
+            HttpRequest req = new HttpRequest(clientRequest);
+
+            HttpResponse resp;
+
+            switch (req.getRequestTarget()) {
+                case "/" -> resp = new HttpResponse(HttpStatus.OK);
+                default -> resp = new HttpResponse(HttpStatus.NOT_FOUND);
+            }
+
+            System.out.println(resp.getResponse());
+            clientSocket.getOutputStream().write(resp.getResponse().getBytes());
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
         }

@@ -1,9 +1,11 @@
-public enum HTTPStatus {
-    OK(200);
+package http;
+
+public enum HttpStatus {
+    OK(200), NOT_FOUND(404);
 
     private final int statusCode;
 
-    HTTPStatus(int statusCode) {
+    HttpStatus(int statusCode) {
         this.statusCode = statusCode;
     }
 
