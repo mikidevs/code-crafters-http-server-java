@@ -1,6 +1,9 @@
 package http;
 
+import http.constants.HttpMethod;
+
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,10 +13,13 @@ public class HttpRequest {
     private HttpMethod method;
     private String requestTarget;
     private Map<String, String> headers;
+    private final Map<String, String> parameters;
 
     private String requestBody;
 
     public HttpRequest(String request) {
+        this.headers = new HashMap<>();
+        this.parameters = new HashMap<>();
         parseRequest(request);
     }
 
@@ -43,19 +49,23 @@ public class HttpRequest {
         }
     }
 
-    public HttpMethod getMethod() {
+    public HttpMethod method() {
         return method;
     }
 
-    public String getRequestTarget() {
+    public String requestTarget() {
         return requestTarget;
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
+    public String requestBody() {
+        return requestBody;
     }
 
-    public String getRequestBody() {
-        return requestBody;
+    public void addParameter(String key, String value) {
+        this.parameters.put(key, value);
+    }
+
+    public String getParameter(String key) {
+        return this.parameters.get(key);
     }
 }
