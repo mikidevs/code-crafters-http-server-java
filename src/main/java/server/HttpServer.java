@@ -2,6 +2,7 @@ package server;
 
 import http.*;
 import http.constants.HttpStatus;
+import utils.ArrayUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +13,8 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class HttpServer {
@@ -79,15 +82,18 @@ public class HttpServer {
     }
 
     private EndpointHandler findHandlerAndUpdateRequest(Map<String, EndpointHandler> endpoints, HttpRequest req) {
+        Pattern requestParamPattern = Pattern.compile("\\{\\w+}");
+        Matcher rpMatcher = requestParamPattern.matcher(req.requestTarget());
+        
         String[] requestFragments = req.requestTarget()
                                        .split("/");
 
         for (String url : endpoints.keySet()) {
             String[] urlFragments = url.split("/");
-            String lastUF = urlFragments[urlFragments.length - 1];
+            String lastUF = ArrayUtils.lastElement(urlFragments);
 
             // requestParams
-            if (lastUF.startsWith("{") && lastUF.endsWith("}")) {
+            if (rpMatcher.hasMatch()) {
                 String sDropLast = Arrays.stream(urlFragments)
                                          .limit(urlFragments.length - 1)
                                          .collect(Collectors.joining("/"));
@@ -97,7 +103,7 @@ public class HttpServer {
                                          .collect(Collectors.joining("/"));
 
                 if (sDropLast.equals(cDropLast)) {
-                    String lastRF = requestFragments[requestFragments.length - 1];
+                    String lastRF = ArrayUtils.lastElement(requestFragments);
 
                     String param = lastUF.replace("{", "");
                     param = param.replace("}", "");
