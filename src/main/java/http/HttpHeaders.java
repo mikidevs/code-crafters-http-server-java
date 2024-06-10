@@ -2,13 +2,16 @@ package http;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class HttpHeaders {
     private final Map<String, String> headers;
 
     public HttpHeaders() {
         this.headers = new HashMap<>();
+    }
+
+    public static HttpHeaders empty() {
+        return new HttpHeaders();
     }
 
     public HttpHeaders contentType(String contentType) {

@@ -10,7 +10,8 @@ public class HttpResponse {
     private HttpHeaders headers;
     private String responseBody;
 
-    public HttpResponse(HttpStatus httpStatus, HttpHeaders headers, String responseBody) {
+
+    private HttpResponse(HttpStatus httpStatus, HttpHeaders headers, String responseBody) {
         this.httpStatus = httpStatus;
         this.headers = headers;
         this.responseBody = responseBody;
@@ -24,6 +25,28 @@ public class HttpResponse {
         this(httpStatus, new HttpHeaders());
     }
 
+    public static HttpResponse ok() {
+        return new HttpResponse(HttpStatus.OK, HttpHeaders.empty(), "");
+    }
+
+    public static HttpResponse notFound() {
+        return new HttpResponse(HttpStatus.NOT_FOUND, HttpHeaders.empty(), "");
+    }
+
+    public HttpResponse withBody(String body) {
+        this.responseBody = body;
+        return this;
+    }
+
+    public HttpResponse withHeaders(HttpHeaders headers) {
+        this.headers = headers;
+        return this;
+    }
+
+    public HttpStatus status() {
+        return httpStatus;
+    }
+
     public String buildString() {
         String statusLine = HTTP_VERSION + " " + httpStatus.getStatus();
         String headers = this.headers.buildString();
@@ -35,24 +58,7 @@ public class HttpResponse {
         );
     }
 
-
     public String getResponseBody() {
         return responseBody;
-    }
-
-    public void setResponseBody(String responseBody) {
-        this.responseBody = responseBody;
-    }
-
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
-
-    public void setHttpStatus(HttpStatus httpStatus) {
-        this.httpStatus = httpStatus;
-    }
-
-    public void setHeaders(HttpHeaders headers) {
-        this.headers = headers;
     }
 }

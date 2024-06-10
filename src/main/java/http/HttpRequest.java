@@ -1,7 +1,7 @@
 package http;
 
 import http.constants.HttpMethod;
-
+import http.utils.ArrayUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,15 +11,15 @@ import java.util.stream.Collectors;
 
 public class HttpRequest {
     private HttpMethod method;
-    private String requestTarget;
+    private Url url;
     private Map<String, String> headers;
-    private final Map<String, String> parameters;
+    private String body;
 
-    private String requestBody;
+    private final Map<String, String> pathVariables;
 
     public HttpRequest(String request) {
         this.headers = new HashMap<>();
-        this.parameters = new HashMap<>();
+        this.pathVariables = new HashMap<>();
         parseRequest(request);
     }
 
@@ -34,7 +34,7 @@ public class HttpRequest {
             if (method.equals("GET")) {
                 this.method = HttpMethod.GET;
             }
-            this.requestTarget = target;
+            this.url = new Url(target);
 
             String[] parts = request.split("\r\n", -1);
             this.headers = Arrays.stream(parts).skip(1)
@@ -43,7 +43,7 @@ public class HttpRequest {
                     .map((s) -> s.split(": "))
                     .collect(Collectors.toMap((l) -> l[0], (l) -> l[1]));
 
-            this.requestBody = parts[parts.length - 1];
+            this.body = ArrayUtils.lastElement(parts);
         } else {
             throw new RuntimeException("Invalid Http String");
         }
@@ -53,19 +53,17 @@ public class HttpRequest {
         return method;
     }
 
-    public String requestTarget() {
-        return requestTarget;
+    public Url url() { return url; }
+
+    public String body() {
+        return body;
     }
 
-    public String requestBody() {
-        return requestBody;
+    public String getPathVariable(String key) {
+        return pathVariables.get(key);
     }
 
-    public void addParameter(String key, String value) {
-        this.parameters.put(key, value);
-    }
-
-    public String getParameter(String key) {
-        return this.parameters.get(key);
+    public void setPathVariable(String key, String value) {
+        this.pathVariables.put(key, value);
     }
 }

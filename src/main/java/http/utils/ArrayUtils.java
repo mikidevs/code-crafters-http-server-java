@@ -1,4 +1,4 @@
-package utils;
+package http.utils;
 
 public class ArrayUtils {
 
