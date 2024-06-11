@@ -15,8 +15,8 @@ public class Url {
         String[] split = url.split("/");
         return switch (split.length) {
             case 0 -> "/";
-            case 1 -> "/" + split[0];
-            default -> String.join("/", Arrays.copyOfRange(split, 0, split.length));
+            case 2 -> "/" + split[1];
+            default -> String.join("/", Arrays.copyOfRange(split, 0, split.length - 1));
         };
     }
 

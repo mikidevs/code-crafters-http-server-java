@@ -41,7 +41,8 @@ public class MapUtils {
         Optional<Url> match = endpointMap.keySet()
                                          .stream()
                                          .parallel()
-                                         .peek(url -> System.out.println("clientReq: " + clientReq.url().initial()))
+                                         .peek(url -> System.out.println("clientReq: " + clientReq.url()
+                                                                                                  .initial()))
                                          .filter(url ->
                                                  clientReq.url()
                                                           .initial()
