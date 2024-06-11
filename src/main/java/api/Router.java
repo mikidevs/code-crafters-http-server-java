@@ -12,15 +12,15 @@ public class Router {
         httpServer
                 .handle(HttpMethod.GET, "/", req -> HttpResponse.ok())
                 .handle(HttpMethod.GET, "/hello", req -> HttpResponse.ok()
-                                                                    .withBody("hello"))
+                                                                     .withBody("hello"))
                 .handle(HttpMethod.GET, "/echo/{str}", (req -> {
                     String body = req.getPathVariable("str");
-                    return HttpResponse.ok()
-                                       .withHeaders(HttpHeaders.builder()
-                                                               .contentLength(body.length())
-                                                               .contentType("text/plain"))
-                                       .withBody(body);
-                }));
+                    return HttpResponse.ok().withContent("text/plain", body);
+                }))
+                .handle(HttpMethod.GET, "/user-agent", req -> {
+                    String body = req.readHeader("User-Agent");
+                    return HttpResponse.ok().withContent("text/plain", body);
+                });
 
         httpServer.listenAndServe();
     }

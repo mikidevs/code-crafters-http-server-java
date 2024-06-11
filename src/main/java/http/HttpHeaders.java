@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpHeaders {
-    private final Map<String, String> headers;
+    private Map<String, String> headers;
 
-    public HttpHeaders() {
+    private HttpHeaders() {
         this.headers = new HashMap<>();
     }
 
@@ -14,14 +14,28 @@ public class HttpHeaders {
         return new HttpHeaders();
     }
 
-    public HttpHeaders contentType(String contentType) {
+    public HttpHeaders withContentType(String contentType) {
         this.headers.put("Content-Type", contentType);
         return this;
     }
 
-    public HttpHeaders contentLength(int contentLength) {
+    public HttpHeaders withContentLength(int contentLength) {
         this.headers.put("Content-Length", String.valueOf(contentLength));
         return this;
+    }
+
+    public String getHeader(String headerName) {
+        return this.headers.get(headerName);
+    }
+
+    public static HttpHeaders fromMap(Map<String, String> httpHeaderMap) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setHeaders(httpHeaderMap);
+        return headers;
+    }
+
+    private void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
     }
 
     public static HttpHeaders builder() {

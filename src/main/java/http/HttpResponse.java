@@ -6,23 +6,14 @@ public class HttpResponse {
     private static final String HTTP_VERSION = "HTTP/1.1";
     private static final String CRLF = "\r\n";
 
-    private HttpStatus httpStatus;
+    private final HttpStatus httpStatus;
     private HttpHeaders headers;
     private String responseBody;
-
 
     private HttpResponse(HttpStatus httpStatus, HttpHeaders headers, String responseBody) {
         this.httpStatus = httpStatus;
         this.headers = headers;
         this.responseBody = responseBody;
-    }
-
-    public HttpResponse(HttpStatus httpStatus, HttpHeaders headers) {
-        this(httpStatus, headers, "");
-    }
-
-    public HttpResponse(HttpStatus httpStatus) {
-        this(httpStatus, new HttpHeaders());
     }
 
     public static HttpResponse ok() {
@@ -31,6 +22,13 @@ public class HttpResponse {
 
     public static HttpResponse notFound() {
         return new HttpResponse(HttpStatus.NOT_FOUND, HttpHeaders.empty(), "");
+    }
+
+    public HttpResponse withContent(String contentType, String body) {
+        this.headers = HttpHeaders.builder()
+                                  .withContentLength(body.length())
+                                  .withContentType(contentType);
+        return this.withBody(body);
     }
 
     public HttpResponse withBody(String body) {

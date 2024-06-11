@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 public class HttpRequest {
     private HttpMethod method;
     private Url url;
-    private Map<String, String> headers;
+    private HttpHeaders headers;
     private String body;
 
     private final Map<String, String> pathVariables;
 
     public HttpRequest(String request) {
-        this.headers = new HashMap<>();
+        this.headers = HttpHeaders.empty();
         this.pathVariables = new HashMap<>();
         parseRequest(request);
     }
@@ -37,12 +37,13 @@ public class HttpRequest {
             this.url = new Url(target);
 
             String[] parts = request.split("\r\n", -1);
-            this.headers = Arrays.stream(parts).skip(1)
+            var headerMap = Arrays.stream(parts).skip(1)
                     .limit(parts.length - 2)
                     .filter(s -> !s.isEmpty())
                     .map((s) -> s.split(": "))
                     .collect(Collectors.toMap((l) -> l[0], (l) -> l[1]));
 
+            this.headers = HttpHeaders.fromMap(headerMap);
             this.body = ArrayUtils.lastElement(parts);
         } else {
             throw new RuntimeException("Invalid Http String");
@@ -57,6 +58,10 @@ public class HttpRequest {
 
     public String body() {
         return body;
+    }
+
+    public String readHeader(String headerName) {
+        return this.headers.getHeader(headerName);
     }
 
     public String getPathVariable(String key) {
