@@ -10,7 +10,7 @@ public class Router {
         HttpServer httpServer = new HttpServer(4221);
 
         httpServer
-                .handle(HttpMethod.GET, "hello", req -> HttpResponse.ok()
+                .handle(HttpMethod.GET, "/hello", req -> HttpResponse.ok()
                                                                     .withBody("hello"))
                 .handle(HttpMethod.GET, "/echo/{str}", (req -> {
                     String body = req.getPathVariable("str");
