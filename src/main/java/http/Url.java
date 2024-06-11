@@ -16,7 +16,7 @@ public class Url {
         return switch (split.length) {
             case 0 -> "/";
             case 1 -> "/" + split[0];
-            default -> String.join("/", Arrays.copyOfRange(split, 0, split.length - 1));
+            default -> String.join("/", Arrays.copyOfRange(split, 0, split.length));
         };
     }
 
