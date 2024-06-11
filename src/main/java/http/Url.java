@@ -16,8 +16,10 @@ public class Url {
     public String initial() {
         if (parts.length > 1) {
             return String.join("/", Arrays.copyOfRange(parts, 0, parts.length - 1));
-        } else {
+        } else if (parts.length == 1) {
             return parts[0];
+        } else {
+            return "";
         }
     }
 
