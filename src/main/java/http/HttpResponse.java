@@ -17,11 +17,11 @@ public class HttpResponse {
     }
 
     public static HttpResponse ok() {
-        return new HttpResponse(HttpStatus.OK, HttpHeaders.empty(), "");
+        return new HttpResponse(HttpStatus.OK, HttpHeaders.builder().withContentLength(0), "");
     }
 
     public static HttpResponse notFound() {
-        return new HttpResponse(HttpStatus.NOT_FOUND, HttpHeaders.empty(), "");
+        return new HttpResponse(HttpStatus.NOT_FOUND, HttpHeaders.builder().withContentLength(0), "");
     }
 
     public HttpResponse withContent(String contentType, String body) {

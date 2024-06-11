@@ -1,13 +1,12 @@
 package api;
 
-import http.HttpHeaders;
 import http.HttpResponse;
 import http.constants.HttpMethod;
 import http.HttpServer;
 
 public class Router {
     public void route() {
-        HttpServer httpServer = new HttpServer(4221);
+        HttpServer httpServer = new HttpServer(4221, 4);
 
         httpServer
                 .handle(HttpMethod.GET, "/", req -> HttpResponse.ok())
